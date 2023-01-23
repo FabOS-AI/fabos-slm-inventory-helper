@@ -1,0 +1,1 @@
+# fabos-slm-inventory-helper
