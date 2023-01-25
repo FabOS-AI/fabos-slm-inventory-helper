@@ -1,0 +1,4 @@
+{
+  "service_name": "dummy_tcp_15dea01c-9b7b-49c0-88f4-61304f6ae2a8",
+  "supported_connection_types": ["ssh","winrm", "tcp"]
+}

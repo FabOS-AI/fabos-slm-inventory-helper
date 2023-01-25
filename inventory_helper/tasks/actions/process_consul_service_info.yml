@@ -1,0 +1,51 @@
+- name: Init Variables for add_host task
+  ansible.builtin.set_fact:
+    ansible_inventory:
+       name: ''
+       groups: []
+       ansible_connection: ''
+       ansible_ssh_user: ''
+       ansible_ssh_pass: ''
+       ansible_port: ''
+       ansible_become_pass: ''
+       ansible_python_interpreter: '/usr/bin/python3'
+       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+- name: Extract connection service object from api return
+  ansible.builtin.set_fact:
+    service: "{{ item }}"
+
+- name: Process Remote Access Service
+  ansible.builtin.include_tasks: actions/process_remote_access_service.yml
+  when:
+    -  supported_connection_types_only_remote | length > 0
+    - '"RemoteAccessService" in service.ServiceTags'
+
+- name: Process None-Remote Access Service
+  when: 'not "RemoteAccessService" in service.ServiceTags'
+  block:
+    - name: Process None-Remote Access Service
+      when:
+        - supported_connection_types_without_remote | length > 0
+        - service.ServiceMeta.connectionType != 'null'
+        - service.ServiceMeta.connectionType in supported_connection_types_without_remote
+      include_tasks: process_non_remote_access_service.yml
+
+    - name: Delegate to Remote Acccess Service of node
+      when:
+        - (supported_connection_types_without_remote | length == 0) or (service.ServiceMeta.connectionType == 'null') or (not service.ServiceMeta.connectionType in supported_connection_types_without_remote)
+        - supported_connection_types_only_remote | length > 0
+      include_tasks: process_delegated_remote_access_service.yml
+
+- name: Add Item to ansible Inventory
+  ansible.builtin.add_host:
+    name:                       "{{ ansible_inventory.name }}"
+    groups:                     "{{ ansible_inventory.groups }}"
+    ansible_connection:         "{{ ansible_inventory.ansible_connection }}"
+    ansible_ssh_user:           "{{ ansible_inventory.ansible_ssh_user }}"
+    ansible_ssh_pass:           "{{ ansible_inventory.ansible_ssh_pass }}"
+    ansible_port:               "{{ ansible_inventory.ansible_port }}"
+    ansible_become_pass:        "{{ ansible_inventory.ansible_become_pass }}"
+    ansible_python_interpreter: "{{ ansible_inventory.ansible_python_interpreter }}"
+    ansible_ssh_common_args:    "{{ ansible_inventory.ansible_ssh_common_args }}"
+  when: ansible_inventory.name is defined

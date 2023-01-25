@@ -1,0 +1,80 @@
+- name: Assert input parameter
+  ansible.builtin.assert:
+    that:
+      - service is defined
+
+- name: Add Service Tags to ansible groups var
+  ansible.builtin.set_fact:
+    ansible_inventory:
+      groups: "{{ service.ServiceTags }}"
+
+- name: Set Filter Expression
+  ansible.builtin.set_fact:
+    filter_exp: "\"RemoteAccessService\" in Tags"
+
+- name: Get Remote Access Connection Service of node with id = '{{ service.ID }}'
+  ansible.builtin.uri:
+    url: "{{ consul_url }}/v1/catalog/node-services/{{ service.Node }}?filter={{ filter_exp | urlencode() }}"
+    method: GET
+    status_code: 200, 404
+    validate_certs: no
+    headers:
+      Authorization: "Bearer {{ consul_token }}"
+  register: output_get_remote_access_service
+  no_log: false
+
+- set_fact:
+    services: "{{ output_get_remote_access_service.json.Services }}"
+
+- debug:
+    msg: "Node with id='{{ service.ID }}' has no remote access service"
+  when: services | length == 0
+
+- name: Process found remote access service
+  when: services | length != 0
+  block:
+    - name: Get remote access service
+      ansible.builtin.uri:
+        url: "{{ consul_url }}/v1/catalog/service/{{ services[0].Service }}"
+        method: GET
+        status_code: 200, 404
+        validate_certs: no
+        headers:
+          Authorization: "Bearer {{ consul_token }}"
+      register: output_connection_service
+      no_log: false
+
+    - name: Extract service object from consul response
+      ansible.builtin.set_fact:
+        remote_access_service: "{{ output_connection_service.json | first }}"
+
+    - name: Get consul KV infos of remote_access_service
+      ansible.builtin.include_tasks: helper/consul_kv/get_kv_of_service.yml
+      vars:
+        service_id: "{{ remote_access_service.ServiceID }}"
+
+    - name: Set KV Path for vault call
+      ansible.builtin.set_fact:
+        kv_path: "resources/data/{{ remote_access_service.ServiceID }}/CredentialUsernamePassword"
+      when:
+        - service_kv.credentialClasses is defined
+        - "'CredentialUsernamePassword' in service_kv.credentialClasses"
+
+    - name: Get Credentials of connection service
+      ansible.builtin.set_fact:
+        username: "{{ lookup('hashi_vault', '{{ vault_lookup_base_info }} secret={{ kv_path }}:username') }}"
+        password: "{{ lookup('hashi_vault', '{{ vault_lookup_base_info }} secret={{ kv_path }}:password') }}"
+        connection_type: "{{ remote_access_service.ServiceMeta.connectionType }}"
+
+    - name: Set Variables for add_host task
+      ansible.builtin.set_fact:
+        ansible_inventory:
+           name: "{{ remote_access_service.Address }}"
+           groups: "{{ (ansible_inventory.groups | default([])) + [connection_type] }}"
+           ansible_connection: '{{ connection_type }}'
+           ansible_ssh_user: '{{ username }}'
+           ansible_ssh_pass: '{{ password }}'
+           ansible_port: "{{ remote_access_service.ServicePort | default(0, true) }}"
+           ansible_become_pass: '{{ password }}'
+           ansible_python_interpreter: '/usr/bin/python3'
+           ansible_ssh_common_args: '-o StrictHostKeyChecking\=no'

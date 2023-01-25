@@ -1,0 +1,39 @@
+---
+- name: Run inventory helper
+  connection: local
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Get Keycloak Token
+      ansible.builtin.uri:
+        url: http://localhost:7080/auth/realms/fabos/protocol/openid-connect/token
+        method: POST
+        body_format: form-urlencoded
+        body:
+          grant_type: password
+          username: fabos
+          password: password
+          client_id: self-service-portal
+      register: output_keycloak_login
+
+    - ansible.builtin.set_fact:
+        keycloak_token: "{{ output_keycloak_login.json.access_token }}"
+
+    - name: Include Inventory Helper Role
+      ansible.builtin.include_role:
+        name: inventory_helper
+        tasks_from: create_inventory.yml
+
+    - debug:
+        var: item
+      loop:
+        - "{{ hostvars }}"
+        - "{{ groups }}"
+
+- name: Test hosts providing connection via tcp
+  connection: local
+  hosts: tcp
+  gather_facts: no
+  tasks:
+    - debug:
+        var: inventory_hostname

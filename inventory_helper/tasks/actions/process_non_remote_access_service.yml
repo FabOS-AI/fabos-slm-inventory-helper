@@ -1,0 +1,30 @@
+- name: Assert input parameter
+  ansible.builtin.assert:
+    that:
+      - service is defined
+
+- name: Get consul KV infos of service
+  ansible.builtin.include_tasks: helper/consul_kv/get_kv_of_service.yml
+  vars:
+    service_id: "{{ service.ServiceID }}"
+
+- name: Get Connection Type of non-remote service
+  ansible.builtin.set_fact:
+    nonRemoteConnectionType: "{{ [service.ServiceMeta.connectionType] }}"
+  when: service.ServiceMeta.connectionType != 'null'
+
+- name: Get Access via Capability Service
+  when: supported_connection_types_without_remote | length > 0
+  block:
+    - name: Set Variables for add_host task
+      ansible.builtin.set_fact:
+        ansible_inventory:
+           name: "{{ service.Address }}"
+           groups: "{{ service.ServiceTags + (nonRemoteConnectionType | default([]) ) }}"
+           ansible_connection: "local"
+           ansible_ssh_user: ""
+           ansible_ssh_pass: ""
+           ansible_port: "{{ service.ServicePort | default(0, true) }}"
+           ansible_become_pass: ""
+           ansible_python_interpreter: "/usr/bin/python3"
+           ansible_ssh_common_args: '-o StrictHostKeyChecking\=no'

@@ -1,0 +1,35 @@
+- name: Assert input parameter
+  ansible.builtin.assert:
+    that:
+      - service is defined
+
+- name: Get consul KV infos of connection type
+  ansible.builtin.include_tasks: helper/consul_kv/get_kv_of_service.yml
+  vars:
+    service_id: "{{ service.ServiceID }}"
+
+- name: Set KV Path for vault call
+  ansible.builtin.set_fact:
+    kv_path: "resources/data/{{ service.ServiceID }}/CredentialUsernamePassword"
+  when:
+    - service_kv.credentialClasses is defined
+    - "'CredentialUsernamePassword' in service_kv.credentialClasses"
+
+- name: Get Credentials of connection service
+  ansible.builtin.set_fact:
+    username: "{{ lookup('hashi_vault', '{{ vault_lookup_base_info }} secret={{ kv_path }}:username') }}"
+    password: "{{ lookup('hashi_vault', '{{ vault_lookup_base_info }} secret={{ kv_path }}:password') }}"
+    connection_type: "{{ service.ServiceMeta.connectionType }}"
+
+- name: Set Variables for add_host task
+  ansible.builtin.set_fact:
+    ansible_inventory:
+       name: "{{ service.Address }}"
+       groups: "{{ (ansible_inventory.groups | default([])) + service.ServiceTags + [connection_type] }}"
+       ansible_connection: '{{ connection_type }}'
+       ansible_ssh_user: '{{ username }}'
+       ansible_ssh_pass: '{{ password }}'
+       ansible_port: "{{ service.ServicePort | default(0, true) }}"
+       ansible_become_pass: '{{ password }}'
+       ansible_python_interpreter: '/usr/bin/python3'
+       ansible_ssh_common_args: '-o StrictHostKeyChecking\=no'
