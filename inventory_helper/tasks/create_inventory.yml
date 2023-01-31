@@ -35,6 +35,10 @@
   ansible.builtin.set_fact:
     vault_lookup_base_info: "url={{ vault_url }} auth_method=token token={{ vault_token }}"
 
+- name: Install required pip packages
+  ansible.builtin.pip:
+    name: hvac
+
 - name: Get consul service(s)
   ansible.builtin.uri:
     url: "{{ consul_url }}/v1/catalog/service/{{ service_name }}"
