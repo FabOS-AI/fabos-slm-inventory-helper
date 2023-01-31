@@ -8,12 +8,18 @@
   vars:
     service_id: "{{ service.ServiceID }}"
 
-- name: Set KV Path for vault call
+- name: Set KV Path for vault call (CredentialUsernamePassword)
   ansible.builtin.set_fact:
-    kv_path: "resources/data/{{ service.ServiceID }}/CredentialUsernamePassword"
+    kv_path: "resources/data/{{ remote_access_service.ServiceID }}/CredentialUsernamePassword"
   when:
     - service_kv.credentialClasses is defined
     - "'CredentialUsernamePassword' in service_kv.credentialClasses"
+
+- name: Set KV Path for vault call (Default)
+  ansible.builtin.set_fact:
+    kv_path: "resources/data/{{ remote_access_service.ServiceID }}/CredentialUsernamePassword"
+  when:
+    - not service_kv.credentialClasses is defined
 
 - name: Get Credentials of connection service
   ansible.builtin.set_fact:
