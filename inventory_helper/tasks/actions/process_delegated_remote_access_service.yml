@@ -77,7 +77,7 @@
         ansible_inventory:
            name: "{{ remote_access_service.Address }}"
            groups: "{{ (ansible_inventory.groups | default([])) + [connection_type] }}"
-           ansible_connection: '{{ connection_type }}'
+           ansible_connection: '{{ connection_type | lower }}'
            ansible_user: '{{ username }}'
            ansible_password: '{{ password }}'
            ansible_ssh_user: '{{ username }}'
