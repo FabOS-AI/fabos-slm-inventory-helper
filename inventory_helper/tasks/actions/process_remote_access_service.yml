@@ -38,9 +38,9 @@
        ansible_ssh_user: '{{ username }}'
        ansible_ssh_pass: '{{ password }}'
        ansible_port: "{{ service.ServicePort | default(0, true) }}"
-       ansible_become_user: "{{ username if connection_type == 'winrm' else '' }}"
+       ansible_become_user: "{{ username if connection_type == 'WinRM' else '' }}"
        ansible_become_pass: '{{ password }}'
-       ansible_become_method: "{{ 'runas' if connection_type == 'winrm' else 'sudo' }}"
-       ansible_winrm_transport: "{{ 'basic' if connection_type == 'winrm' else '' }}"
+       ansible_become_method: "{{ 'runas' if connection_type == 'WinRM' else 'sudo' }}"
+       ansible_winrm_transport: "{{ 'basic' if connection_type == 'WinRM' else '' }}"
        ansible_python_interpreter: '/usr/bin/python3'
        ansible_ssh_common_args: '-o StrictHostKeyChecking\=no'
