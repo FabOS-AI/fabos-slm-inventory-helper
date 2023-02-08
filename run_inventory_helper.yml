@@ -22,7 +22,6 @@
     - name: Include Inventory Helper Role
       ansible.builtin.include_role:
         name: inventory_helper
-        tasks_from: create_inventory.yml
 
     - debug:
         var: item
