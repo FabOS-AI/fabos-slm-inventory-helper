@@ -83,7 +83,7 @@
            ansible_ssh_user: '{{ username }}'
            ansible_ssh_pass: '{{ password }}'
            ansible_port: "{{ remote_access_service.ServicePort | default(0, true) }}"
-           ansible_become_user: '{{ username }}'
+           ansible_become_user: "{{ username if connection_type == 'winrm' else '' }}"
            ansible_become_pass: '{{ password }}'
            ansible_become_method: "{{ 'runas' if connection_type == 'winrm' else 'sudo' }}"
            ansible_winrm_transport: "{{ 'basic' if connection_type == 'winrm' else '' }}"
