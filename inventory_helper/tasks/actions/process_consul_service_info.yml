@@ -1,15 +1,15 @@
-- name: Init Variables for add_host task
-  ansible.builtin.set_fact:
-    ansible_inventory:
-       name: ''
-       groups: []
-       ansible_connection: ''
-       ansible_ssh_user: ''
-       ansible_ssh_pass: ''
-       ansible_port: ''
-       ansible_become_pass: ''
-       ansible_python_interpreter: '/usr/bin/python3'
-       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+#- name: Init Variables for add_host task
+#  ansible.builtin.set_fact:
+#    ansible_inventory:
+#       name: ''
+#       groups: []
+#       ansible_connection: ''
+#       ansible_ssh_user: ''
+#       ansible_ssh_pass: ''
+#       ansible_port: ''
+#       ansible_become_pass: ''
+#       ansible_python_interpreter: '/usr/bin/python3'
+#       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 
 - name: Extract connection service object from api return
   ansible.builtin.set_fact:
@@ -39,18 +39,37 @@
 
 - name: Add Item to ansible Inventory
   ansible.builtin.add_host:
+    # GENERAL
     name:                       "{{ ansible_inventory.name }}"
     groups:                     "{{ ansible_inventory.groups }}"
     ansible_connection:         "{{ ansible_inventory.ansible_connection }}"
+    ansible_port:               "{{ ansible_inventory.ansible_port }}"
+    ansible_shell_type:         "{{ ansible_inventory.ansible_shell_type }}"
+    ansible_python_interpreter: "{{ ansible_inventory.ansible_python_interpreter }}"
     ansible_user:               "{{ ansible_inventory.ansible_user }}"
     ansible_password:           "{{ ansible_inventory.ansible_password }}"
-    ansible_ssh_user:           "{{ ansible_inventory.ansible_ssh_user }}"
-    ansible_ssh_pass:           "{{ ansible_inventory.ansible_ssh_pass }}"
-    ansible_port:               "{{ ansible_inventory.ansible_port }}"
-    ansible_become_user:        "{{ ansible_inventory.ansible_become_user }}"
-    ansible_become_pass:        "{{ ansible_inventory.ansible_become_pass }}"
-    ansible_become_method:      "{{ ansible_inventory.ansible_become_method }}"
-    ansible_winrm_transport:    "{{ ansible_inventory.ansible_winrm_transport }}"
-    ansible_python_interpreter: "{{ ansible_inventory.ansible_python_interpreter }}"
-    ansible_ssh_common_args:    "{{ ansible_inventory.ansible_ssh_common_args }}"
+    # BECOME
+    ansible_become_user:    "{{ ansible_inventory.ansible_become_user }}"
+    ansible_become_pass:    "{{ ansible_inventory.ansible_become_pass }}"
+    ansible_become_method:  "{{ ansible_inventory.ansible_become_method }}"
+    # SSH
+    ansible_ssh_user:         "{{ ansible_inventory.ansible_ssh_user }}"
+    ansible_ssh_password:     "{{ ansible_inventory.ansible_ssh_password }}"
+    ansible_ssh_port:         "{{ ansible_inventory.ansible_ssh_port }}"
+    ansible_ssh_common_args:  "{{ ansible_inventory.ansible_ssh_common_args }}"
+    ansible_ssh_retries:      "{{ ansible_inventory.ansible_ssh_retries }}"
+    # WinRM
+    ansible_winrm_port:                   "{{ ansible_inventory.ansible_winrm_port }}"
+    ansible_winrm_transport:              "{{ ansible_inventory.ansible_winrm_transport }}"
+    ansible_winrm_connection_timeout_sec: "{{ ansible_inventory.ansible_winrm_connection_timeout_sec }}"
+    ansible_winrm_operation_timeout_sec:  "{{ ansible_inventory.ansible_winrm_operation_timeout_sec }}"
+    ansible_winrm_read_timeout_sec:       "{{ ansible_inventory.ansible_winrm_read_timeout_sec }}"
+    ansible_winrm_server_cert_validation: "{{ ansible_inventory.ansible_winrm_server_cert_validation }}"
+    # PSRP
+    ansible_psrp_port:                  "{{ ansible_inventory.ansible_psrp_port }}"
+    ansible_psrp_connection_timeout:    "{{ ansible_inventory.ansible_psrp_connection_timeout }}"
+    ansible_psrp_operation_timeout:     "{{ ansible_inventory.ansible_psrp_operation_timeout }}"
+    ansible_psrp_read_timeout:          "{{ ansible_inventory.ansible_psrp_read_timeout }}"
+    ansible_psrp_reconnection_retries:  "{{ ansible_inventory.ansible_psrp_reconnection_retries }}"
+    ansible_psrp_cert_validation:       "{{ ansible_inventory.ansible_psrp_cert_validation }}"
   when: ansible_inventory.name is defined
