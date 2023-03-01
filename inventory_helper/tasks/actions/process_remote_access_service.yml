@@ -115,7 +115,7 @@
       groups: "{{ (ansible_inventory.groups | default([])) + service.ServiceTags + [connection_type] }}"
       ansible_connection: "ssh"
       ansible_port: "{{ service.ServicePort | default(0, true) }}"
-      ansible_shell_type: "powershell"
+      ansible_shell_type: "cmd"
       ansible_python_interpreter: '/usr/bin/python3'
       ansible_user: "{{ username }}"
       ansible_password: "{{ password }}"
