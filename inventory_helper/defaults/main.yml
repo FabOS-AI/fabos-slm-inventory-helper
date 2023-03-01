@@ -1,3 +1,3 @@
 ---
 # defaults file for inventory_helper
-remote_access_connection_types: ['ssh', 'winrm']
+remote_access_connection_types: ['ssh', 'winrm', 'winssh']
