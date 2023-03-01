@@ -73,7 +73,7 @@
         connection_type: "{{ remote_access_service.ServiceMeta.connectionType }}"
 
     - name: Set Variables for add_host task (ssh)
-      when: connection_type | lower == ssh
+      when: (connection_type | lower) == "ssh"
       ansible.builtin.set_fact:
         ansible_inventory:
           # GENERAL
@@ -111,8 +111,9 @@
           ansible_psrp_cert_validation: ignore
 
     - name: Set Variables for add_host task (WinRM)
-      when: (connection_type | lower) == winrm
+      when: (connection_type | lower) == "winrm"
       ansible.builtin.set_fact:
+        ansible_inventory:
           # GENERAL
           name: "{{ service.Address }}"
           groups: "{{ (ansible_inventory.groups | default([])) + service.ServiceTags + [connection_type] }}"
@@ -148,8 +149,9 @@
           ansible_psrp_cert_validation: ignore
 
     - name: Set Variables for add_host task (win-ssh)
-      when: (connection_type | lower) == win-ssh
+      when: (connection_type | lower) == "winssh"
       ansible.builtin.set_fact:
+        ansible_inventory:
           # GENERAL
           name: "{{ service.Address }}"
           groups: "{{ (ansible_inventory.groups | default([])) + service.ServiceTags + [connection_type] }}"
