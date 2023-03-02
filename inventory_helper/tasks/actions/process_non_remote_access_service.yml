@@ -23,7 +23,7 @@
           name: "{{ service.Address }}"
           groups: "{{ service.ServiceTags + (nonRemoteConnectionType | default([]) ) }}"
           ansible_connection: "local"
-          ansible_port: "{{ service.ServicePort | default(1, true) }}"
+          ansible_port: "{{ service.ServicePort | default('', true) | int }}"
           ansible_shell_type: ""
           ansible_python_interpreter: '/usr/bin/python3'
           ansible_user: "{{ username | default('') }}"
@@ -35,18 +35,18 @@
           # SSH
           ansible_ssh_user: ""
           ansible_ssh_password: ""
-          ansible_ssh_port: ""
+          ansible_ssh_port: "{{ '' | int }}"
           ansible_ssh_common_args: ''
           ansible_ssh_retries: 1
           # WinRM
-          ansible_winrm_port: "0"
+          ansible_winrm_port: "{{ '' | int }}"
           ansible_winrm_transport: ""
           ansible_winrm_connection_timeout_sec: 0
           ansible_winrm_operation_timeout_sec: 0
           ansible_winrm_read_timeout_sec: 0
           ansible_winrm_server_cert_validation: ignore
           # PSRP
-          ansible_psrp_port: "0"
+          ansible_psrp_port: "{{ '' | int }}"
           ansible_psrp_connection_timeout: 0
           ansible_psrp_operation_timeout: 0
           ansible_psrp_read_timeout: 0

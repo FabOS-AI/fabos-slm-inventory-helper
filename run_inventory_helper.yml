@@ -30,7 +30,6 @@
         - "{{ groups }}"
 
 - name: Test hosts providing connection via tcp
-  connection: local
   hosts: tcp
   gather_facts: no
   tasks:
