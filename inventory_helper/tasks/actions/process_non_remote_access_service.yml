@@ -23,7 +23,7 @@
           name: "{{ service.Address }}"
           groups: "{{ service.ServiceTags + (nonRemoteConnectionType | default([]) ) }}"
           ansible_connection: "local"
-          ansible_port: "{{ service.ServicePort | default('', true) }}"
+          ansible_port: "{{ service.ServicePort | default(1, true) }}"
           ansible_shell_type: ""
           ansible_python_interpreter: '/usr/bin/python3'
           ansible_user: "{{ username | default('') }}"
