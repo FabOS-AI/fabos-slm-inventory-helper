@@ -26,8 +26,8 @@
           ansible_port: "{{ service.ServicePort | default(0, true) }}"
           ansible_shell_type: ""
           ansible_python_interpreter: '/usr/bin/python3'
-          ansible_user: "{{ username }}"
-          ansible_password: "{{ password }}"
+          ansible_user: "{{ username | default("") }}"
+          ansible_password: "{{ password | default("") }}"
           # BECOME
           ansible_become_user: ""
           ansible_become_pass: ""
