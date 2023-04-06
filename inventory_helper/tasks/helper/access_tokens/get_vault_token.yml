@@ -10,11 +10,8 @@
       role: default
       jwt: "{{ keycloak_token }}"
   register: output_vault_login
-  no_log: false
+  no_log: true
 
 - ansible.builtin.set_fact:
     vault_token: "{{ output_vault_login.json.auth.client_token }}"
-
-
-#- ansible.builtin.set_fact:
-#    vault_token: "{{ output_vault_login.json.SecretID }}"
+  no_log: true
