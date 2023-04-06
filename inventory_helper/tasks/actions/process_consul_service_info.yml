@@ -72,4 +72,7 @@
     ansible_psrp_read_timeout:          "{{ ansible_inventory.ansible_psrp_read_timeout }}"
     ansible_psrp_reconnection_retries:  "{{ ansible_inventory.ansible_psrp_reconnection_retries }}"
     ansible_psrp_cert_validation:       "{{ ansible_inventory.ansible_psrp_cert_validation }}"
+    # Consul/Vault data
+    consul_service_meta:    "{{ consul_service_meta }}"
+    vault_service_secrets:  "{{ vault_service_secrets }}"
   when: ansible_inventory.name is defined
