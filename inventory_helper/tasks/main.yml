@@ -53,14 +53,14 @@
 - name: Set Vault Lookup Path
   ansible.builtin.set_fact:
     vault_lookup_path: "url={{ vault_url }} token={{ vault_token }} secret=resources/data/{{output_consul_services.json[0].ServiceID}}"
-  no_log: true
+  # no_log: true
 
 - name: Extract Consul Service Meta Info/Vault Service Secrets
   ansible.builtin.set_fact:
     consul_service_meta: "{{ output_consul_services.json[0].ServiceMeta | default({}) }}"
     vault_service_secrets: "{{ lookup('community.hashi_vault.hashi_vault', vault_lookup_path) | default({}) }}"
   ignore_errors: true
-  no_log: true
+  # no_log: true
 
 - name: Process Consul Service information
   when: output_consul_services.json | length >= 1
