@@ -55,6 +55,11 @@
     vault_lookup_path: "url={{ vault_url }} token={{ vault_token }} secret=resources/data/{{output_consul_services.json[0].ServiceID}}"
   # no_log: true
 
+- name: Initialize Consul Service Meta Info/Vault Service Secrets
+  ansible.builtin.set_fact:
+    consul_service_meta: {}
+    vault_service_secrets: {}
+
 - name: Extract Consul Service Meta Info/Vault Service Secrets
   ansible.builtin.set_fact:
     consul_service_meta: "{{ output_consul_services.json[0].ServiceMeta | default({}) }}"
