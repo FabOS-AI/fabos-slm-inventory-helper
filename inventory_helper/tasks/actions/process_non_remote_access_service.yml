@@ -3,6 +3,8 @@
     that:
       - service is defined
 
+
+
 - name: Get consul KV infos of service
   ansible.builtin.include_tasks: helper/consul_kv/get_kv_of_service.yml
   vars:
