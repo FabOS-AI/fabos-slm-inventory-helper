@@ -37,11 +37,15 @@
         - supported_connection_types_only_remote | length > 0
       include_tasks: process_delegated_remote_access_service.yml
 
+- name: Build groups list for host
+  set_fact:
+    host_groups: "{{ (extra_groups | default([])) + ansible_inventory.groups }}"
+
 - name: Add Item to ansible Inventory
   ansible.builtin.add_host:
     # GENERAL
     name:                       "{{ ansible_inventory.name }}"
-    groups:                     "{{ (extra_groups | default([])) + ansible_inventory.groups }}"
+    groups:                     "{{ host_groups }}"
     ansible_connection:         "{{ ansible_inventory.ansible_connection }}"
     ansible_port:               "{{ ansible_inventory.ansible_port }}"
     ansible_shell_type:         "{{ ansible_inventory.ansible_shell_type }}"
