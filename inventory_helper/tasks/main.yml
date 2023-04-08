@@ -77,3 +77,7 @@
   when: output_consul_services.json | length == 0
   fail:
     msg: "No service with service-name = '{{ service_name }}' found"
+
+- name: Clear variable 'ansible_inventory', to prevent variable propagation
+  ansible.builtin.set_fact:
+    ansible_inventory: {}
