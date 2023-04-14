@@ -50,6 +50,10 @@
   register: output_consul_services
   no_log: false
 
+- name: Print received consul services
+  ansible.builtin.debug:
+    var: output_consul_services.json
+
 - name: Set Vault Lookup Path
   ansible.builtin.set_fact:
     vault_lookup_path: "url={{ vault_url }} token={{ vault_token }} secret=resources/data/{{output_consul_services.json[0].ServiceID}}"
