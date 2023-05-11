@@ -1,7 +1,1 @@
-# fabos-slm-inventory-helper
-
-run test-playbook:
-
-```shell
-ansible-playbook -vv -e "@extra-vars.json" run_inventory_helper.yml
-```
+The Service Lifecycle Management was transferred to the [Eclipse Service Lifecycle Management](https://projects.eclipse.org/projects/dt.slm) project at the Eclipse Foundation. Therefore, this repository was transferred to the new repository [eclipse-slm/slm-ansible-role-inventory-helper](https://github.com/eclipse-slm/slm-ansible-role-inventory-helper) and set to archived.
